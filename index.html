@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pixelizer</title>
+
+    <link rel="stylesheet" href="./style/style.css">
+</head>
+
+<body>
+    <form method="dialog" onsubmit="apply()">
+        <div class="div-flex-item-center">
+            <div class="div-flex div-flex-row item-bg-color-grey">
+                <div class="div-flex-item-center">
+                    <canvas id="pixelizerCanvas"></canvas>
+                </div>
+                <div class="div-flex-item-left">
+                    <h1>Pixelizer</h1>
+                    <strong>Selcione uma imagem</strong><br>
+                    <input type="file" name="file" id="myFile">
+    
+                    <br><br>
+                    
+                    <strong>Escala de pixel</strong><br>
+                    <input type="number" name="scale" id="scale">
+    
+                    <br><br>
+    
+                    <button type="submit">Aplicar</button>
+                </div>
+            </div>
+        </div>
+    </form>
+
+    <div class="footer text-center">
+        <small>by <a href="https://gabrielgpa.github.io">gabrielgpa</a></small>
+    </div>
+
+    <script type="module">
+        import Pixelizer from './core/PixelizerFactory.js';
+        import Utils from './core/Utils.js';
+
+        const image = document.getElementById('myFile');
+        const scale = document.getElementById('scale');
+        const canvas = document.getElementById('pixelizerCanvas');
+
+        const img = new Image();
+        const pixelizer = Pixelizer(image, ~~scale, canvas);
+        const utils = Utils();
+
+        document.getElementById('myFile').addEventListener('change', async (event) => {
+            try {
+                let imageSrc = await utils.renderFile(event, window);
+
+                img.src = imageSrc;
+            } catch (error) {
+                alert('Navegador não suportado');
+            }
+        });
+
+        function apply() {
+            const scale = document.getElementById('scale');
+            const canvas = document.getElementById('pixelizerCanvas');
+            const pixelizer = Pixelizer(img, ~~scale.value, canvas);
+            
+            try {
+                pixelizer.handler();   
+            } catch (error) {
+                if (error === 'error-scale') {
+                    alert('Informe a escala de pixels válida');
+                    return;
+                }
+
+                if (error === 'error-image') {
+                    alert('Selecione uma imagem');
+                    return;
+                }
+            }
+        }
+
+        window.apply = apply;
+    </script>
+</body>
+
+</html>
